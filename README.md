@@ -278,6 +278,16 @@ $APP->post('verify', function(VerifyData $body, Database $db) {
 });
 ```
 
+Behind a reverse proxy (Cloudflare, Nginx, Apache, ...)? The real client IP isn't in `REMOTE_ADDR` anymore. Tell `HTTPSrv` which header to trust, then use `HTTPSrv::remote_addr()` instead of reading `$_SERVER['REMOTE_ADDR']` directly:
+
+```php
+// config.php or index.php, once at startup
+HTTPSrv::behindRevProxy('HTTP_X_FORWARDED_FOR');
+
+// anywhere later
+$ip = HTTPSrv::remote_addr();
+```
+
 ### 3. ORM Persistence (db.php)
 
 Define schema as model properties:

@@ -78,8 +78,7 @@
  * @internal Registered via spl_autoload_register().
  */
 spl_autoload_register(function ($class) {
-  global $_PHPEZ_BUNDLED_;
-  $fpx = isset($_PHPEZ_BUNDLED_) ? '' : '/..';
+  $fpx = glb('_PHPEZ_BUNDLED_') ? '' : '/..';
   $file = __DIR__  . $fpx . '/claz/' . str_replace('\\', '/', $class) . '.php';
   if (file_exists($file)) {
     require_once($file);

@@ -47,7 +47,7 @@ class User extends Model {
 
   public function setLast(): static {
     $this->lastD = new DBDateTime();
-    $this->lastIP = HTTP::remote_addr();
+    $this->lastIP = HTTPSrv::remote_addr();
     return $this;
   }
 

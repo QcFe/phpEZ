@@ -87,6 +87,12 @@ Database::cfg(
 );
 
 /**
+ * You're behind a reverse proxy (e.g., Cloudflare, Nginx, Apache)?
+ * Enable this to get the correct client IP address from the X-Forwarded-For header.
+ */
+HTTPSrv::behindRevProxy('HTTP_X_FORWARDED_FOR');
+
+/**
  * Create the application router.
  * 
  * The App instance manages all API endpoints and coordinates request routing.

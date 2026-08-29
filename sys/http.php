@@ -92,25 +92,46 @@ enum HTTP: string {
     if ($meth) return $this->value === $meth;
     return $this === static::method();
   }
+};
+
+/**
+ * HTTP server utility class for request context.
+ * 
+ * Provides methods to retrieve client IP addresses, accounting for reverse proxies.
+ * Designed as a static utility class; cannot be instantiated.
+ * 
+ * @subpackage http
+ */
+final class HTTPSrv {
+  private function __construct() {
+    throw new Exception('HTTPSrv is a static class and cannot be instantiated.');
+  }
+
+  private static ?string $proxyHeader = 'REMOTE_ADDR';
+
+  /**
+   * Set the HTTP header to trust for client IP detection behind reverse proxies.
+   * 
+   * @param string $header The HTTP header to use for client IP detection, must be in $_SERVER.
+   * @return void
+   */
+  public static function behindRevProxy(string $header): void {
+    static::$proxyHeader = $header;
+  }
 
   /**
    * Get the remote client IP address, accounting for proxies.
    * 
-   * Checks HTTP headers in order of reliability to determine the actual client IP:
-   * 1. HTTP_CLIENT_IP (from client proxy)
-   * 2. HTTP_X_FORWARDED_FOR (from proxy chain)
-   * 3. REMOTE_ADDR (direct connection)
+   * Checks HTTP headers in order of reliability to determine the actual client IP
    * 
    * @return string The client IP address.
    * @throws HTTPException If no IP address can be determined.
    */
   public static function remote_addr(): string {
-    return $_SERVER['HTTP_CLIENT_IP']
-      ?? $_SERVER['HTTP_X_FORWARDED_FOR']
-      ?? $_SERVER['REMOTE_ADDR']
+    return $_SERVER[static::$proxyHeader]
       ?? HTTPException::throw(msg: 'remote_addr_unkn');
   }
-};
+}
 
 /**
  * HTTP response status codes enum.
