@@ -96,7 +96,30 @@ class ObjDef {
 class OmitEmpty extends ObjAttribute {
 }
 
+/**
+ * Attribute specifying the element type of an array property.
+ * 
+ * Array-typed properties on Obj have no inherent element type, so #[ArrayOf]
+ * tells __unserialize() what class to instantiate (and call parse() on) for
+ * each element of the incoming array.
+ * 
+ * Usage:
+ * ```php
+ * class Order extends Obj {
+ *   #[ArrayOf(LineItem::class)]
+ *   public array $items;
+ * }
+ * ```
+ * 
+ * @see Obj::__unserialize()
+ * @subpackage iface
+ */
 class ArrayOf extends ObjAttribute {
+  /**
+   * Initialize the array element type attribute.
+   * 
+   * @param string $innerType Fully-qualified class name of the array elements.
+   */
   public function __construct(public string $innerType) {
   }
 }

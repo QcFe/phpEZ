@@ -170,6 +170,13 @@ class Get {
   }
 }
 
+/**
+ * Body parameter accessor for POST requests.
+ * 
+ * Same interface as Get, but reads values from $_POST instead of $_GET.
+ * 
+ * @subpackage http
+ */
 class Post extends Get {
   /**
    * Retrieve a POST parameter value with optional default.
@@ -461,12 +468,13 @@ class App {
   /**
    * Initialize the App with an optional root directory.
    * 
+   * Remember to call startup() to begin request processing in case of
+   * file-based routing, otherwise you can directly call run() after
+   * registering routes.
+   * 
    * @param string $root The root directory for file-based route loading.
    *                      Routes can be split across multiple PHP files organized
    *                      in a directory hierarchy matching URL paths.
-   * Remember to call startup() to begin request processing
-   * in case of file-based routing,
-   * otherwise you can directly call run() after registering routes.
    */
   public function __construct(protected string $root = '') {
   }

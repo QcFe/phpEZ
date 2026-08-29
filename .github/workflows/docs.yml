@@ -1,0 +1,83 @@
+name: Docs
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, fileinfo, iconv, libxml, mbstring, phar, xml, xmlwriter
+
+      - name: Determine version
+        id: version
+        run: echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Download phpDocumentor
+        run: curl -sL https://github.com/phpDocumentor/phpDocumentor/releases/latest/download/phpDocumentor.phar -o phpDocumentor.phar
+
+      - name: Generate API docs
+        run: |
+          php phpDocumentor.phar run \
+            -d sys \
+            -t site/${{ steps.version.outputs.version }} \
+            --title "phpEZ ${{ steps.version.outputs.version }}"
+
+      - name: Checkout existing docs site
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+        continue-on-error: true
+
+      # "latest" always mirrors the newest release
+      - name: Assemble site
+        run: |
+          rm -rf "site/latest"
+          cp -r "site/${{ steps.version.outputs.version }}" "site/latest"
+
+          versions=("${{ steps.version.outputs.version }}")
+          if [ -d gh-pages ]; then
+            for d in gh-pages/*/; do
+              name="$(basename "$d")"
+              [ "$name" = "latest" ] && continue
+              versions+=("$name")
+            done
+          fi
+          mapfile -t versions < <(printf '%s\n' "${versions[@]}" | sort -Vru)
+
+          {
+            echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>phpEZ documentation</title></head><body>'
+            echo '<h1>phpEZ documentation</h1>'
+            echo "<p><a href=\"latest/\">Latest (${{ steps.version.outputs.version }})</a></p>"
+            echo '<h2>All versions</h2><ul>'
+            for v in "${versions[@]}"; do
+              echo "<li><a href=\"$v/\">$v</a></li>"
+            done
+            echo '</ul></body></html>'
+          } > site/index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          keep_files: true

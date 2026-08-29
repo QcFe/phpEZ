@@ -4,8 +4,6 @@
  * @package PHPEz
  */
 
-use function PHPSTORM_META\type;
-
 /**
  * Attribute to mark a database field as UNIQUE.
  * 
@@ -17,7 +15,30 @@ use function PHPSTORM_META\type;
 class Unique extends ObjAttribute {
 }
 
+/**
+ * Attribute to create a composite (multi-column) UNIQUE constraint.
+ * 
+ * Multiple fields sharing the same $indexName are combined into a single
+ * UNIQUE index during DDL generation.
+ * 
+ * Usage:
+ * ```php
+ * #[UniqueMulti('idx_user_role')]
+ * public int $user_id;
+ * #[UniqueMulti('idx_user_role')]
+ * public string $role;
+ * ```
+ * 
+ * @subpackage db
+ * @see Model::ddl()
+ */
 class UniqueMulti extends ObjAttribute {
+  /**
+   * Initialize the composite unique index attribute.
+   * 
+   * @param string $indexName The name of the shared unique index. Must not be empty.
+   * @throws InvalidArgumentException If indexName is empty.
+   */
   public function __construct(public string $indexName) {
     if (!$indexName) {
       throw new InvalidArgumentException('unique_multi_index_name_empty');
@@ -414,12 +435,43 @@ trait CachableModel {
   }
 }
 
+/**
+ * Filter option for querying soft-deleted rows.
+ * 
+ * @see SoftDelete::findMany()
+ * @see SoftDelete::find()
+ * @subpackage db
+ */
 enum SoftDeleteFilter {
+  /** Only rows where deleted_at IS NULL (default). */
   case EXCLUDE;
+  /** All rows, regardless of deleted_at. */
   case INCLUDE;
+  /** Only rows where deleted_at IS NOT NULL. */
   case ONLY;
 }
 
+/**
+ * Trait adding soft-delete support to a Model.
+ * 
+ * Instead of removing rows, delete() (by default) sets a deleted_at timestamp.
+ * find()/findMany() transparently exclude soft-deleted rows unless a
+ * SoftDeleteFilter is given.
+ * 
+ * Usage:
+ * ```php
+ * class Post extends Model {
+ *   use SoftDelete;
+ * }
+ * 
+ * $post->delete();                       // soft delete
+ * $post->delete(soft: false);            // hard delete
+ * $post->restore();                      // undo soft delete
+ * Post::find($id, softDeleteFilter: SoftDeleteFilter::ONLY);
+ * ```
+ * 
+ * @subpackage db
+ */
 trait SoftDelete {
   abstract public function save($forCreate = false, ?int $idForUpdate = null): static;
   abstract public function id(): ?int;
@@ -427,10 +479,21 @@ trait SoftDelete {
   #[Index('idx_deleted_at')]
   protected ?DBDateTime $deleted_at = null;
 
+  /**
+   * Check whether this instance is soft-deleted.
+   * 
+   * @return bool True if deleted_at is set.
+   */
   public function isDeleted(): bool {
     return isset($this->deleted_at);
   }
 
+  /**
+   * Undo a soft delete by clearing deleted_at and saving.
+   * 
+   * @return static Returns $this for fluent interface.
+   * @throws DataException If the instance has no ID or is not currently deleted.
+   */
   public function restore(): static {
     if (!$this->id()) {
       DataException::throw(msg: 'restore_no_id', more: [
