@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+
+      - name: Build phpez.php bundle
+        run: php build/package.php
+
+      - name: Lint bundle
+        run: php -l phpez.php
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: phpez.php
+          generate_release_notes: true

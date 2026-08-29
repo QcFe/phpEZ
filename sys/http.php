@@ -393,38 +393,6 @@ class JSONDateTime extends SerializableDateTime {
   }
 }
 
-class RRuleDateTime extends SerializableDateTime {
-  protected static function getFormat(): string {
-    return ICS::DT_FORMAT;
-  }
-
-  public function parse(mixed $data): static {
-    if (!is_string($data)) {
-      throw new Exception("Invalid data type for parsing: " . gettype($data));
-    }
-
-    $utc = new DateTimeZone('UTC');
-    $dt = DateTime::createFromFormat(static::getFormat(), $data, $utc)
-      ?: throw new Exception("Invalid date format for unserialization: $data");
-
-    $this->setTimestamp($dt->getTimestamp());
-    $this->setTimezone($utc);
-    return $this;
-  }
-
-  public function marshall(): string {
-    $dt = clone $this;
-    $dt->setTimezone(new DateTimeZone('UTC'));
-    return $dt->format(static::getFormat());
-  }
-
-  public static function fromDT(DateTime $dt): static {
-    $rrdt = parent::fromDT($dt);
-    $rrdt->setTimezone(new DateTimeZone('UTC'));
-    return $rrdt;
-  }
-}
-
 /**
  * Load a PHP file in a clean context with access to the App instance.
  * 

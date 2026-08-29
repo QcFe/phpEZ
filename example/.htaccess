@@ -1,0 +1,65 @@
+##
+# PHPEz API URL Rewriting Configuration example
+#
+# This .htaccess file implements clean URL routing for the API. All requests
+# are rewritten to index.php with the path stored in the __p query parameter.
+#
+# Request flow:
+# 1. User/client requests: GET /api/users/42
+# 2. Apache URL rewriter matches the RewriteRule
+# 3. Request is rewritten to: index.php?__p=users/42
+# 4. index.php receives the path and passes it to App::startup()
+# 5. App routes the request to the appropriate handler
+#
+# Example rewrites:
+# ┌─────────────────────────────────┬──────────────────────────────────────┐
+# │ Original Request                │ Rewritten to                         │
+# ├─────────────────────────────────┼──────────────────────────────────────┤
+# │ GET /api/users                  │ index.php?__p=users                  │
+# │ POST /api/users                 │ index.php?__p=users                  │
+# │ GET /api/users/42               │ index.php?__p=users/42               │
+# │ GET /api/posts/1/comments       │ index.php?__p=posts/1/comments       │
+# │ GET /api/search?q=test          │ index.php?__p=search&q=test          │
+# └─────────────────────────────────┴──────────────────────────────────────┘
+#
+# Flags explained:
+# - L (Last): Stop rewriting if this rule matches (prevent multiple rewrites)
+# - QSA (Query String Append): Preserve existing query parameters
+#
+# Notes:
+# - Apache's mod_rewrite must be enabled
+# - .htaccess must be in the api/ directory (same as index.php)
+# - The api/ directory must have AllowOverride FileInfo enabled
+#
+# Testing:
+# If rewrites aren't working, check:
+# 1. mod_rewrite is enabled: a2enmod rewrite
+# 2. AllowOverride is set: <Directory /var/www/html/calendula/api>
+#      AllowOverride FileInfo
+#    </Directory>
+# 3. .htaccess file exists in api/ directory
+#
+# Security considerations:
+# - QSA preserves all query parameters for flexibility
+# - The __p parameter is consumed only in index.php, you can use any other name if desired
+# - Route validation happens in App::startup() (no path traversal allowed)
+#
+
+RewriteEngine On
+
+##
+# Rewrite all requests to index.php with the path in __p parameter
+#
+# Pattern: ^(.*)$
+#   Matches any request path (the .* captures the entire path)
+#   The captured path is available as $1
+#
+# Target: index.php?__p=$1
+#   Rewrites to index.php with the path as __p parameter
+#   QSA flag preserves any other query parameters
+#
+# Example:
+#   /api/users?role=admin
+#   Becomes: /api/index.php?__p=users&role=admin
+#
+RewriteRule ^(.*)$ index.php?__p=$1 [L,QSA]
