@@ -54,3 +54,8 @@ $APP->put('{id:i}', function (int $id, UserData $data) {
   User::requireAdmin();
   return User::fromDto($data)->setLast()->save(idForUpdate: $id)->dto();
 });
+
+$APP->get('dashboard', function () {
+  User::requireAdmin();
+  return html('<html><body><h1>Admin Dashboard</h1></body></html>');
+});

@@ -707,7 +707,7 @@ abstract class Model extends Obj {
    * 
    * @return string The prefixed table name derived from class name.
    */
-  protected static function tbl() {
+  public static function tbl() {
     return Database::pfx() . static::class;
   }
 

@@ -331,19 +331,23 @@ class Api {
 
     $out =  ($this->handler)(...$args) ?? null;
 
-    if (!$out || is_array($out)) {
-      // nil => ok
-    } else if (method_exists($out, '__serialize')) {
-      $out = $out->__serialize();
+    if (!$out || is_array($out) || method_exists($out, '__serialize')) {
+      final_json(['success' => true, 'data' => $out]);
     } else if ($out instanceof HTTPCode) {
       http_response_code($out->value); // No Content
+      exit;
+    } else if ($out instanceof CustomResponse) {
+      http_response_code($out->statusCode);
+      foreach ($out->headers ?? [] as $k => $v) {
+        header("$k: $v");
+      }
+      $out->stream();
       exit;
     } else {
       HTTPException::throw(500, 'unsupported_output_type', more: [
         'type' => gettype($out),
       ]);
     }
-    final_json(['success' => true, 'data' => $out]);
     exit;
   }
 
@@ -421,6 +425,63 @@ class JSONDateTime extends SerializableDateTime {
  */
 function require_blank_ctx(string $path, App $APP) {
   require_once($path);
+}
+
+/**
+ * Base class for custom response types with specific Content-Type handling.
+ * 
+ * Subclasses must implement the stream() method to output the response body.
+ * 
+ * @subpackage http
+ */
+abstract class CustomResponse {
+  /**
+   * The Content-Type of the request body this class handles.
+   */
+  public function __construct(public int $statusCode = 200, public ?array $headers = null) {
+  }
+
+  abstract public function stream(): void;
+}
+
+class StringHTMLContent extends CustomResponse {
+  public function __construct(public readonly string $content) {
+    parent::__construct(headers: ['Content-Type' => 'text/html']);
+  }
+
+  public function stream(): void {
+    echo $this->content;
+  }
+}
+
+/**
+ * Helper function to create a StringHTMLContent response.
+ * 
+ * @param string $html The HTML content to send in the response.
+ * @return StringHTMLContent A custom response object with the given HTML.
+ */
+function html(string $html): StringHTMLContent {
+  return new StringHTMLContent($html);
+}
+
+class Redirect extends CustomResponse {
+  public function __construct(public readonly string $url, int $statusCode = 302) {
+    parent::__construct(headers: ['Location' => $url], statusCode: $statusCode);
+  }
+
+  public function stream(): void {
+  }
+}
+
+/**
+ * Helper function to create a Redirect response.
+ * 
+ * @param string $url The URL to redirect to.
+ * @param int $statusCode The HTTP status code for the redirect (default 302).
+ * @return Redirect A custom response object that performs the redirect.
+ */
+function redirect(string $url, int $statusCode = 302): Redirect {
+  return new Redirect($url, $statusCode);
 }
 
 /**
