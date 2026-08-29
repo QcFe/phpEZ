@@ -122,6 +122,7 @@
   <ul class="versions">
 {{VERSION_LIST}}
   </ul>
+  <p>Find the project on <a href="https://github.com/QcFe/phpEZ">GitHub/QcFe/phpEZ</a>.</p>
 </main>
 </body>
 </html>
