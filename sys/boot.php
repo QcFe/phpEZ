@@ -157,25 +157,3 @@ require_once('db.php');
  * @see Sex
  */
 require_once('sex.php');
-
-/**
- * Load application configuration.
- * 
- * Should define:
- * - Database::cfg() call to configure database connection
- * - $debug flag for debug mode
- * - Any environment-specific setup
- * 
- * Example config.php:
- * ```php
- * $debug = $_ENV['APP_DEBUG'] ?? false;
- * 
- * Database::cfg(
- *   $_ENV['DB_DSN'],
- *   $_ENV['DB_USER'],
- *   $_ENV['DB_PASS'],
- *   $_ENV['DB_PREFIX'] ?? ''
- * );
- * ```
- */
-require_once(__DIR__ . '/../config.php');

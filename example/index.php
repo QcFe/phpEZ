@@ -69,6 +69,24 @@
 require_once('phpez.php');
 
 /**
+ * Bootstrap the application configuration.
+ * 
+ * Sets up the database connection and other application-specific settings.
+ */
+$DB_HOST = '1.2.3.4';
+
+if ($_SERVER['HTTP_HOST'] === 'localhost') {
+  $DB_HOST = 'localhost';
+  $debug = true;
+}
+
+Database::cfg(
+  "mysql:host=$DB_HOST;dbname=MyDatabase",
+  'MyUser',
+  'MyPassword',
+);
+
+/**
  * Create the application router.
  * 
  * The App instance manages all API endpoints and coordinates request routing.
