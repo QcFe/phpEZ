@@ -2,6 +2,8 @@
 
 > A lean, elegant, zero-boilerplate PHP framework for building REST APIs.
 
+📖 [API documentation](https://qcfe.github.io/phpEZ/latest/)
+
 ## Why PHPEz?
 
 Tired of massive frameworks with thousands of files, confusing conventions, and tons of boilerplate? PHPEz eliminates all that noise through **smart design patterns** and **automatic reflection-based code generation**.

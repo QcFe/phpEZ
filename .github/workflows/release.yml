@@ -31,3 +31,4 @@ jobs:
         with:
           files: phpez.php
           generate_release_notes: true
+          body: "📖 [Documentation](https://qcfe.github.io/phpEZ/${{ github.ref_name }}/)"

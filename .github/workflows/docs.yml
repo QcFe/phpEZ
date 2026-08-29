@@ -48,13 +48,29 @@ jobs:
           path: gh-pages
         continue-on-error: true
 
-      # "latest" always mirrors the newest release
+      # "latest" is a static redirect page rather than a copy/symlink, so it
+      # survives peaceiris/actions-gh-pages' dereferencing copy untouched.
       - name: Assemble site
         run: |
-          rm -rf "site/latest"
-          cp -r "site/${{ steps.version.outputs.version }}" "site/latest"
+          version="${{ steps.version.outputs.version }}"
 
-          versions=("${{ steps.version.outputs.version }}")
+          mkdir -p "site/latest"
+          cat > site/latest/index.html <<EOF
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+          <meta charset="utf-8">
+          <meta http-equiv="refresh" content="0; url=../${version}/">
+          <script>location.replace('../${version}/');</script>
+          <title>phpEZ documentation</title>
+          </head>
+          <body>
+          <p>Redirecting to <a href="../${version}/">${version}</a>&hellip;</p>
+          </body>
+          </html>
+          EOF
+
+          versions=("$version")
           if [ -d gh-pages ]; then
             for d in gh-pages/*/; do
               name="$(basename "$d")"
@@ -64,16 +80,20 @@ jobs:
           fi
           mapfile -t versions < <(printf '%s\n' "${versions[@]}" | sort -Vru)
 
-          {
-            echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>phpEZ documentation</title></head><body>'
-            echo '<h1>phpEZ documentation</h1>'
-            echo "<p><a href=\"latest/\">Latest (${{ steps.version.outputs.version }})</a></p>"
-            echo '<h2>All versions</h2><ul>'
-            for v in "${versions[@]}"; do
-              echo "<li><a href=\"$v/\">$v</a></li>"
-            done
-            echo '</ul></body></html>'
-          } > site/index.html
+          version_list=""
+          for v in "${versions[@]}"; do
+            version_list+="    <li><a href=\"$v/\">$v</a></li>"$'\n'
+          done
+
+          template="gh-pages/index.html.template"
+          if [ ! -f "$template" ]; then
+            echo "::error::$template not found on gh-pages branch"
+            exit 1
+          fi
+
+          awk -v latest="$version" -v list="$version_list" '
+            { gsub(/\{\{LATEST_VERSION\}\}/, latest); gsub(/\{\{VERSION_LIST\}\}/, list); print }
+          ' "$template" > site/index.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
