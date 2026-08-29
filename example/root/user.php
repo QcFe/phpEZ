@@ -11,7 +11,8 @@ class UserData extends LoginData {
   public string $name;
   public string $surn;
   public ?int $id = null;
-  public bool $isAdmin;
+  #[OmitEmpty]
+  public bool $isAdmin = false;
 }
 
 $APP->get('', function () {
@@ -29,6 +30,20 @@ $APP->post('login', function (LoginData $data) {
     HTTPException::throw(401, 'invalid_login');
   }
   return $usr->setLast()->save()->toSex()->dto();
+});
+
+$APP->post('register', function (UserData $data) {
+  $usr = User::fromSex();
+  if ($usr && !$usr->isAdmin) {
+    HTTPException::throw(403, 'already_logged_in');
+  }
+  if (!$data->pass) {
+    HTTPException::throw(400, 'pass_required');
+  }
+  if (!$usr) {
+    $data->isAdmin = false; // self-registration can never grant admin
+  }
+  return User::fromDto($data)->setLast()->save(forCreate: true)->toSex()->dto();
 });
 
 $APP->post('logout', function () {

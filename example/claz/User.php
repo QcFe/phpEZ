@@ -37,8 +37,7 @@ class User extends Model {
 
   public function verifyPw(string $pw): bool {
     if (empty($this->hash)) {
-      die('no_hash');
-      return false; // No password set
+      HTTPException::throw(500, 'user_no_pw', more: ['uname' => $this->uname]);
     }
     [$hashFn, $hash, $salt] = explode(':', $this->hash);
     $computedHash = hash($hashFn, $salt . $pw);

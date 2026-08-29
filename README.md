@@ -86,6 +86,8 @@ If you need less than the full framework, you can cherry-pick individual files f
 
 ## Quick Start
 
+You can find a complete working example in [example/](example/) about user management, including login, registration, and logout functionality. Here's a quick overview of the steps to get started.
+
 ### 1. Create a Model
 
 ```php
@@ -156,6 +158,22 @@ $APP->get('', function () {
   return User::me()->dto();
 });
 
+// POST /user/register
+
+$APP->post('register', function (UserData $data) {
+  $usr = User::fromSex();
+  if ($usr && !$usr->isAdmin) {
+    HTTPException::throw(403, 'already_logged_in');
+  }
+  if (!$data->pass) {
+    HTTPException::throw(400, 'pass_required');
+  }
+  if (!$usr) {
+    $data->isAdmin = false; // self-registration can never grant admin
+  }
+  return User::fromDto($data)->setLast()->save(forCreate: true)->toSex()->dto();
+});
+
 // POST /user/login - Login user
 $APP->post('login', function (LoginData $data) {
   $usr = User::find($data->uname, 'uname');
@@ -189,7 +207,7 @@ curl -X POST http://localhost/api/user/login \
 # Register
 curl -X POST http://localhost/api/user/register \
   -H "Content-Type: application/json" \
-  -d '{"uname":"alice","pass":"password123","email":"alice@example.com","name":"Alice","surn":"Smith","id":null}'
+  -d '{"uname":"alice","pass":"password123","email":"alice@example.com","name":"Alice","surn":"Smith"}'
 
 # Get current user
 curl http://localhost/api/user/
@@ -235,7 +253,7 @@ return $user->dto();  // Array converted to JSON response
 - Nested objects: Any `Obj` subclass
 - Custom types: Implement `Parsable` interface
 - Dates: Use `DBDateTime` or `JSONDateTime`
-- DTO conversion: Use `.dto()` to get array, `.fromDto($obj)` to load
+- easy DTO conversion: implement quick `.dto()` / `.fromDto($obj)` methods to convert to/from a plain `Obj` DTO (see [example/claz/User.php](example/claz/User.php))
 
 ### 2. Smart Routing (http.php)
 
@@ -347,7 +365,7 @@ $user->setLast()->save()->toSex()->dto();
 - Foreign keys with cascade/restrict behavior
 - Dirty tracking (`isDirty()`)
 - Session persistence (`toSex()`, `fromSex()`)
-- DTO serialization (`.dto()`, `.fromDto()`)
+- Easy DTO serialization: define your own `.dto()` / `.fromDto()` methods (see [example/claz/User.php](example/claz/User.php))
 
 ### 4. Session Management (sex.php)
 
@@ -548,8 +566,22 @@ class User extends Model {
   #[Unique]
   public string $username;
 
+  public string $name;
+  public string $surn;
+
+
   #[DoNotSerialize]
-  public string $password_hash;
+  protected string $hash;
+
+  // see example/claz/User.php for a full salted-hash implementation
+  public function setPw(string $pw): static {
+    $this->hash = password_hash($pw, PASSWORD_DEFAULT);
+    return $this;
+  }
+
+  public function verifyPw(string $pw): bool {
+    return password_verify($pw, $this->hash);
+  }
 }
 
 // api/root/users.php
@@ -564,7 +596,7 @@ $APP->post('/register', function(RegisterRequest $body) {
   $user = new User();
   $user->email = $body->email;
   $user->username = $body->username;
-  $user->password_hash = password_hash($body->password, PASSWORD_DEFAULT);
+  $user->setPw($body->password);
   $user->save(forCreate: true);
 
   // Store in session
@@ -578,7 +610,7 @@ $APP->post('/register', function(RegisterRequest $body) {
 $APP->post('/login', function(LoginRequest $body) {
   $user = User::find($body->email, 'email');
 
-  if (!$user || !password_verify($body->password, $user->password_hash)) {
+  if (!$user || !$user->verifyPw($body->password)) {
     HTTPException::throw(code: 401, msg: 'invalid_credentials');
   }
 
@@ -621,13 +653,13 @@ class Post extends Model {
 
 // api/root/posts.php
 
-$APP->get('/posts', function(Get $status, Get $limit) {
+$APP->get('/posts', function(Get $status) {
   $cond = 'status = :status';
-  $params = ['status' => $status->v('published')];
+  $params = [
+    'status' => $status->v('published'),
+  ];
 
-  $posts = Post::findMany($cond, $params);
-
-  return $posts;
+  return Post::findMany($cond, $params);
 });
 
 $APP->get('/users/{id:i}/posts', function(int $id) {
