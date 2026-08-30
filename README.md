@@ -1,6 +1,10 @@
 # PHPEz Framework
 
-> A lean, elegant, zero-boilerplate PHP framework for building REST APIs.
+> A lean, elegant, zero-boilerplate tiny PHP framework for building REST APIs.
+
+Read "pee-aitch-peasy", as "PHP Easy" — it's designed to be simple, fast, and easy to use.
+
+PHPEz is a single-file framework that aims to provide a kinda complete API stack with routing, ORM, serialization, and session management.
 
 📖 [API documentation](https://qcfe.github.io/phpEZ/latest/)
 
@@ -128,6 +132,8 @@ User::createTable();
 // api/index.php
 require_once('phpez.php');
 
+Sex::initGlobal();
+
 Database::cfg(
   'mysql:host=localhost;dbname=MyDatabase',
   'MyUser',
@@ -139,6 +145,8 @@ $APP->startup($_GET['__p'] ?? '');
 ```
 
 ### 4. Create API Endpoint
+
+See [example](example) for a completely implemented user management system.
 
 ```php
 <?php
@@ -509,7 +517,7 @@ api/
 **Registers:**
 
 - PSR-4 autoloader for classes in `claz/`
-- Exception handlers (error, exception, shutdown)
+- Exception handlers (error, exception, shutdown) with included debug stack traces
 - All framework components in dependency order
 
 ### exceptions.php

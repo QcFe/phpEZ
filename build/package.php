@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 /**
@@ -11,18 +12,18 @@
  * Usage: php build/package.php [output-path]
  */
 
+echo "-----\nphpEZ single-file bundler\n-----\n";
+
 $root = dirname(__DIR__);
 $sysDir = $root . '/sys';
 $entry = $sysDir . '/boot.php';
 $out = $argv[1] ?? $root . '/phpez.php';
 
-function strip_open_tag(string $code): string
-{
+function strip_open_tag(string $code): string {
   return preg_replace('/^\s*<\?php\s*/', '', $code, 1);
 }
 
-function inline_requires(string $path, string $dir, array &$seen): string
-{
+function inline_requires(string $path, string $dir, array &$seen): string {
   $code = strip_open_tag(file_get_contents($path));
 
   return preg_replace_callback(
@@ -48,4 +49,5 @@ $header = "<?php\n\n/**\n * phpEZ {$version} - single-file bundle.\n * Auto-gene
 
 file_put_contents($out, $header . $bundle);
 
-echo "Bundled " . basename($out) . " (" . filesize($out) . " bytes)\n";
+echo "Bundled " . basename($out) . " (" . filesize($out) . " bytes) to " . $out . "\n";
+echo "Included files: " . implode("\n", array_map(fn($f) => "- $f", array_keys($seen))) . "\n";
