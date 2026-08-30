@@ -128,7 +128,7 @@ class User extends Model {
    * Throws an HTTPException if no user is logged in.
    */
   public static function require(): static {
-    return self::me() ?? HTTPException::throw('not_logged_in', 401);
+    return self::me() ?? HTTPException::throw(401, 'not_logged_in');
   }
 
   /**
@@ -138,7 +138,7 @@ class User extends Model {
   public static function requireAdmin(): static {
     $u = self::require();
     if (!$u->isAdmin) {
-      HTTPException::throw('unauthorized', 403);
+      HTTPException::throw(403, 'unauthorized');
     }
     return $u;
   }
