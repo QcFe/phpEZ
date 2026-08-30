@@ -1,12 +1,12 @@
 <?php
 
 /**
- * @package PHPEz
+ * @package phpEZ
  */
 
 /** 
  * 
- * PHPEz Framework Bootstrap and Autoloader.
+ * phpEZ Framework Bootstrap and Autoloader.
  * 
  * This file is the entry point for the framework. It sets up all essential
  * components in the correct dependency order and configures the autoloader.

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package PHPEz
+ * @package phpEZ
  */
 
 /**
@@ -236,7 +236,7 @@ function excClean(mixed $e) {
 }
 
 /**
- * Global PHP error handler for PHPEz.
+ * Global PHP error handler for phpEZ.
  * 
  * Converts PHP errors (warnings, notices, etc) into throwable ErrorExceptions.
  * This ensures all errors are caught by the exception handler for consistent
@@ -252,7 +252,7 @@ set_error_handler(
 );
 
 /**
- * Global PHP exception handler for PHPEz.
+ * Global PHP exception handler for phpEZ.
  * 
  * Catches all uncaught exceptions and fatal errors. Sends a standardized
  * JSON error response with HTTP status code. In debug mode, includes full
@@ -311,7 +311,7 @@ set_exception_handler(function (Throwable $e) {
 });
 
 /**
- * Global PHP shutdown handler for PHPEz.
+ * Global PHP shutdown handler for phpEZ.
  * 
  * Catches fatal errors that occur after exception handlers have been triggered
  * but during shutdown (e.g., parse errors, out of memory). Ensures even

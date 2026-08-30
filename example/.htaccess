@@ -1,5 +1,5 @@
 ##
-# PHPEz API URL Rewriting Configuration example
+# phpEZ API URL Rewriting Configuration example
 #
 # This .htaccess file implements clean URL routing for the API. All requests
 # are rewritten to index.php with the path stored in the __p query parameter.

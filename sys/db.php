@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package PHPEz
+ * @package phpEZ
  */
 
 /**
@@ -258,7 +258,7 @@ class DuplicateException extends DataException {
 }
 
 /**
- * Central database connection manager for PHPEz.
+ * Central database connection manager for phpEZ.
  * 
  * Provides a static, singleton PDO connection with lazy initialization.
  * Configuration is set once via cfg(), then get() retrieves the connection.

@@ -1,6 +1,6 @@
 <?php
 
-// This file is part of the example application demonstrating how to use the PHPEz framework. It defines the routes and handlers for user-related operations, including login, logout, registration, and user management. The code utilizes the User model and the Sex session management system to handle user authentication and session persistence. The routes are defined using the $APP object, which is an instance of the application router.
+// This file is part of the example application demonstrating how to use the phpEZ framework. It defines the routes and handlers for user-related operations, including login, logout, registration, and user management. The code utilizes the User model and the Sex session management system to handle user authentication and session persistence. The routes are defined using the $APP object, which is an instance of the application router.
 
 class LoginData extends Obj {
   public string $uname;

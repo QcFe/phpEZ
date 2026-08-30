@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHPEz Application Entry Point.
+ * phpEZ Application Entry Point.
  * 
  * This is the main index.php file for the API. All requests are routed here
  * via .htaccess URL rewriting. The file bootstraps the framework, initializes
@@ -55,7 +55,7 @@
  */
 
 /**
- * Bootstrap the PHPEz framework.
+ * Bootstrap the phpEZ framework.
  * 
  * Loads all framework components in dependency order:
  * - Exception system

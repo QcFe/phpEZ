@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package PHPEz
+ * @package phpEZ
  */
 
 /**
@@ -15,7 +15,7 @@ $_startup = microtime(true);
 /**
  * Sends a final JSON response and terminates the request.
  * 
- * This is the standardized output function for the PHPEz API. It ensures only one
+ * This is the standardized output function for the phpEZ API. It ensures only one
  * JSON response is sent, appends request processing time, and halts execution.
  * 
  * If called multiple times, subsequent calls will dump to output with "FATAL:" prefix
@@ -52,7 +52,7 @@ function final_json(array|object $out) {
 /**
  * HTTP request method enum.
  * 
- * Represents standard HTTP verbs supported by the PHPEz API framework.
+ * Represents standard HTTP verbs supported by the phpEZ API framework.
  * Provides utilities to get the current request method and validate method types.
  * 
  * @subpackage http
@@ -136,7 +136,7 @@ final class HTTPSrv {
 /**
  * HTTP response status codes enum.
  * 
- * Defines common HTTP status codes used throughout the PHPEz framework for
+ * Defines common HTTP status codes used throughout the phpEZ framework for
  * standardized API responses and error handling.
  * 
  * @subpackage http

@@ -1,11 +1,11 @@
 <?php
 
 /**
- * @package PHPEz
+ * @package phpEZ
  */
 
 /**
- * PHPEz session management helper.
+ * phpEZ session management helper.
  * 
  * Session => Sess => Sex (not what you're thinking 😄)
  * 

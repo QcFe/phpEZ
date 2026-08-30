@@ -1,11 +1,11 @@
 <?php
 
 /**
- * @package PHPEz
+ * @package phpEZ
  */
 
 /**
- * Base class for property-level attributes in the PHPEz framework.
+ * Base class for property-level attributes in the phpEZ framework.
  * 
  * Provides a reusable foundation for declaring metadata attributes on object properties.
  * Subclasses define behavior (e.g., OmitEmpty, DoNotSerialize) that affects serialization,
@@ -40,7 +40,7 @@ class ObjAttribute {
 }
 
 /**
- * Base class for class-level attributes in the PHPEz framework.
+ * Base class for class-level attributes in the phpEZ framework.
  * 
  * Provides a reusable foundation for declaring metadata attributes on classes.
  * Subclasses define behavior (e.g., ObjDef) that affects serialization,
@@ -203,7 +203,7 @@ interface Parsable {
 /**
  * Base class for serializable/deserializable API data objects.
  * 
- * Obj is the foundation of PHPEz's data handling. It provides automatic
+ * Obj is the foundation of phpEZ's data handling. It provides automatic
  * bidirectional serialization using PHP reflection and type hints, eliminating
  * boilerplate mappers, validators, and serializers.
  * 

@@ -1,22 +1,22 @@
-# PHPEz Framework
+# phpEZ Framework
 
 > A lean, elegant, zero-boilerplate tiny PHP framework for building REST APIs.
 
 Read "pee-aitch-peasy", as "PHP Easy" — it's designed to be simple, fast, and easy to use.
 
-PHPEz is a single-file framework that aims to provide a kinda complete API stack with routing, ORM, serialization, and session management.
+phpEZ is a single-file framework that aims to provide a kinda complete API stack with routing, ORM, serialization, and session management.
 
 📖 [API documentation](https://qcfe.github.io/phpEZ/latest/)
 
-Be sure to have a look at the [example project](example/) for a complete, working API built with PHPEz, and to the [YOU MUST NOT](#you-must-not) section below before writing your own code.
+Be sure to have a look at the [example project](example/) for a complete, working API built with phpEZ, and to the [YOU MUST NOT](#you-must-not) section below before writing your own code.
 
 ## Minimum required PHP version: 8.4
 
-PHPEz is built to run on plain, basic LAMP stacks — the kind that still powers most shared hosting in 2026. No Composer, no build step, no PHP extensions beyond the defaults: just upload `phpez.php` alongside your code and it works.
+phpEZ is built to run on plain, basic LAMP stacks — the kind that still powers most shared hosting in 2026. No Composer, no build step, no PHP extensions beyond the defaults: just upload `phpez.php` alongside your code and it works.
 
-## Why PHPEz?
+## Why phpEZ?
 
-Tired of massive frameworks with thousands of files, confusing conventions, and tons of boilerplate? PHPEz eliminates all that noise through **smart design patterns** and **automatic reflection-based code generation**.
+Tired of massive frameworks with thousands of files, confusing conventions, and tons of boilerplate? phpEZ eliminates all that noise through **smart design patterns** and **automatic reflection-based code generation**.
 
 ### The Problem with Existing Frameworks
 
@@ -25,9 +25,9 @@ Tired of massive frameworks with thousands of files, confusing conventions, and 
 - **Migration hell**: Database schema spread across files
 - **Routing confusion**: Decorators, annotations, config arrays
 
-### The PHPEz Solution
+### The phpEZ Solution
 
-PHPEz uses **modern PHP features** (type hints, attributes, enums, readonly properties) to generate everything automatically:
+phpEZ uses **modern PHP features** (type hints, attributes, enums, readonly properties) to generate everything automatically:
 
 - ✅ **Zero serialization boilerplate** - Reflection generates JSON serialization
 - ✅ **Zero mapper boilerplate** - Type hints auto-convert nested objects
@@ -807,7 +807,7 @@ $user2 = User::findById(42);  // Returns cached instance
 ### "Headers already sent" errors
 
 - Use `Sex::ensure()` (or `$sex->ensure()` on an instance) instead of directly calling `session_start()`
-- PHPEz handles lazy session initialization
+- phpEZ handles lazy session initialization
 
 ## YOU MUST NOT
 
@@ -822,7 +822,7 @@ Rules the framework relies on but can't enforce at runtime:
 
 ## Contributing
 
-PHPEz is designed to be minimal and focused. Before adding features, consider:
+phpEZ is designed to be minimal and focused. Before adding features, consider:
 
 - Does it increase file count significantly?
 - Could the same result be achieved with a simpler approach?
