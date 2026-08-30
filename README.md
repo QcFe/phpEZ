@@ -95,16 +95,18 @@ You can find a complete working example in [example/](example/) about user manag
 // api/claz/User.php
 
 class User extends Model {
+  use Sexable;
+
   public string $email;
 
   #[Unique]
   public string $username;
 
-  #[DoNotSerialize]
-  public string $password_hash;
+  #[OmitEmpty]
+  public string $hash;
 
   public function verifyPw(?string $pw): bool {
-    return some_password_verify($pw ?? '', $this->password_hash);
+    return some_password_verify($pw ?? '', $this->hash);
   }
 }
 ```
@@ -116,6 +118,8 @@ class User extends Model {
 // One-time setup
 User::createTable();
 ```
+
+(or you can use [tools/dbalign.php](tools/dbalign.php) to interactively align the database schema with your model definitions).
 
 ### 3. Bootstrap in index.php
 
@@ -191,8 +195,7 @@ $APP->post('login', function (LoginData $data) {
 // POST /user/logout - Logout user
 $APP->post('logout', function () {
   User::require();
-  global $SEX;
-  $SEX->destroy();
+  Sex::destroy();
 });
 ```
 
@@ -369,31 +372,49 @@ $user->setLast()->save()->toSex()->dto();
 
 ### 4. Session Management (sex.php)
 
-Lazy-initialized, namespaced sessions:
+Provides a namespaced, type-safe interface to PHP sessions with automatic lazy initialization (prevents "headers already sent" errors). It supports both a global shared instance (via static methods) and custom isolated instances.
 
 ```php
-global $SEX;
+// --- GLOBAL API (Sex::method) ---
+// Initialize the global session in bootstrap (index.php)
+Sex::initGlobal();
 
-// Persist model to session
+// Persist model to global session
 $user->toSex();
 
-// Store anything
-$SEX->put('current_user', $user);
-$SEX->put('auth_token', $token);
+// Store anything globally
+Sex::put('current_user', $user);
+Sex::put('auth_token', $token);
 
 // Retrieve
-$user = $SEX->get('current_user');
+$user = Sex::get('current_user');
 
 // Fluent API
-$SEX->ensure()
+Sex::ensure()
     ->put('foo', 'bar')
     ->put('baz', 'qux');
 
 // Retrieve user or throw 401
 User::require();
 
-// Cleanup
-$SEX->destroy();
+
+// --- INSTANCE API ($sex->method) ---
+// Custom namespaced instance (avoids collisions)
+$customSex = new Sex('custom_namespace');
+
+$customSex->ensure()
+          ->put('step', 1)
+          ->put('draft', $data);
+
+$draft = $customSex->get('draft');
+
+
+// --- CLEANUP ---
+Sex::clear();         // Clear only the global namespace data
+$customSex->clear();  // Clear only the custom namespace data
+
+Sex::destroy();       // BEWARE: destroys the entire PHP session! All namespaces are gone.
+
 ```
 
 ### 5. Error Handling (exceptions.php)
@@ -432,6 +453,7 @@ Response format:
 ```
 
 ## Configuration
+
 Configuration lives directly in `index.php`, right after requiring the framework and before creating the `App`:
 
 ```php
@@ -547,7 +569,6 @@ Session management ("SessioN eXtensions").
 **Provides:**
 
 - `Sex` - Lazy-initialized session wrapper
-- `$SEX` - Global instance
 - Namespaced session storage
 - Fluent API for method chaining
 
@@ -622,8 +643,7 @@ $APP->post('/login', function(LoginRequest $body) {
 // api/root/me.php
 
 $APP->get('/me', function() {
-  global $SEX;
-  $user = $SEX->get('current_user');
+  $user = User::fromSex();  // Retrieves from session
 
   if (!$user) {
     HTTPException::throw(code: 401, msg: 'not_authenticated');
@@ -778,7 +798,7 @@ $user2 = User::findById(42);  // Returns cached instance
 
 ### "Headers already sent" errors
 
-- Use `$SEX->ensure()` instead of directly calling `session_start()`
+- Use `Sex::ensure()` (or `$sex->ensure()` on an instance) instead of directly calling `session_start()`
 - PHPEz handles lazy session initialization
 
 ## YOU MUST NOT

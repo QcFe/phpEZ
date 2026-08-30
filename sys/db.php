@@ -1192,42 +1192,6 @@ abstract class Model extends Obj {
   }
 
   /**
-   * Store this model instance in the session (Sex).
-   * 
-   * Persists the model to $_SESSION for retrieval across requests.
-   * Model must be persisted to database first (have an ID and no pending changes).
-   * 
-   * Uses the model's class name as the session key (optionally suffixed with $key).
-   * 
-   * @param string|null $key Optional suffix for session key (useful for storing
-   *                          multiple instances of the same model class).
-   * @return static Returns $this for fluent interface.
-   * @throws HTTPException If model is not persisted or has unsaved changes.
-   * 
-   * @example
-   * ```php
-   * $user = User::find(42);
-   * $user->toSex();  // Stored in $_SESSION['User']
-   * 
-   * // Retrieve from another request:
-   * $user = User::fromSex();
-   * ```
-   */
-  public function toSex($key = null): static {
-    if (!$this->id() || $this->isDirty()) {
-      throw new HTTPException('model_must_be_persisted', more: [
-        'id' => $this->id(),
-        'dirty' => $this->isDirty(),
-        '_hash' => $this->_hash,
-        'myhash' => $this->makeHash(),
-      ]);
-    }
-    global $SEX;
-    $SEX->ensure()->put(static::class . ($key ?? ''), $this);
-    return $this;
-  }
-
-  /**
    * Check if this model has been modified since it was loaded/saved.
    * 
    * Compares the current state hash with the hash saved at load time.
@@ -1238,36 +1202,6 @@ abstract class Model extends Obj {
   public function isDirty(): bool {
     if (!$this->_hash) return false;
     return $this->_hash !== $this->makeHash();
-  }
-
-  /**
-   * Retrieve a model instance from the session (Sex).
-   * 
-   * Restores a model previously stored via toSex() from $_SESSION.
-   * 
-   * @param string|null $key Optional suffix for session key (must match toSex() key).
-   * @return static The restored model instance.
-   * @throws DataException If model not found in session.
-   * 
-   * @example
-   * ```php
-   * $user = User::find(42);
-   * $user->toSex('current');
-   * 
-   * // Later, in another request:
-   * $user = User::fromSex('current');
-   * ```
-   */
-  public static function fromSex($key = null): static {
-    global $SEX;
-    $out = $SEX->ensure()->get(static::class . ($key ?? ''));
-    if (!$out) {
-      DataException::throw(msg: 'sex_model_not_found', more: [
-        'claz' => static::class,
-        'key' => $key,
-      ]);
-    }
-    return $out;
   }
 }
 

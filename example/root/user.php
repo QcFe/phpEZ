@@ -1,5 +1,7 @@
 <?php
 
+// This file is part of the example application demonstrating how to use the PHPEz framework. It defines the routes and handlers for user-related operations, including login, logout, registration, and user management. The code utilizes the User model and the Sex session management system to handle user authentication and session persistence. The routes are defined using the $APP object, which is an instance of the application router.
+
 class LoginData extends Obj {
   public string $uname;
   #[OmitEmpty]
@@ -32,26 +34,15 @@ $APP->post('login', function (LoginData $data) {
   return $usr->setLast()->save()->toSex()->dto();
 });
 
-$APP->post('register', function (UserData $data) {
-  $usr = User::fromSex();
-  if ($usr && !$usr->isAdmin) {
-    HTTPException::throw(403, 'already_logged_in');
-  }
-  if (!$data->pass) {
-    HTTPException::throw(400, 'pass_required');
-  }
-  if (!$usr) {
-    $data->isAdmin = false; // self-registration can never grant admin
-  }
-  return User::fromDto($data)->setLast()->save(forCreate: true)->toSex()->dto();
-});
-
 $APP->post('logout', function () {
   User::require();
-  global $SEX;
-  $SEX->destroy();
+  Sex::destroy();
 });
 
+/**
+ * List all users.
+ * Requires admin privileges.
+ */
 $APP->get('list', function () {
   User::requireAdmin();
   return array_map(
@@ -60,9 +51,22 @@ $APP->get('list', function () {
   );
 });
 
+/**
+ * Open registration mode.
+ * If you want this endpoint to be only accessible to admins, you can use User::requireAdmin();
+ */
 $APP->post('', function (UserData $data) {
-  User::requireAdmin();
-  return User::fromDto($data)->setLast()->save(forCreate: true)->dto();
+  $me = User::me();
+  if ($me && !$me->isAdmin) {
+    HTTPException::throw(403, 'already_logged_in');
+  }
+  if (!$data->pass) {
+    HTTPException::throw(400, 'pass_required');
+  }
+  if (!$me) {
+    $data->isAdmin = false; // self-registration must not grant admin
+  }
+  return User::fromDto($data)->setLast()->save(forCreate: true)->toSex()->dto();
 });
 
 $APP->put('{id:i}', function (int $id, UserData $data) {

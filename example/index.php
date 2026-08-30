@@ -93,6 +93,33 @@ Database::cfg(
 HTTPSrv::behindRevProxy('HTTP_X_FORWARDED_FOR');
 
 /**
+ * Global application session instance (if needed).
+ * 
+ * Initializes the global Sex instance for app-wide session management.
+ * 
+ * This method should be called once during application bootstrap (e.g., in index.php).
+ * Subsequent calls will throw a LogicException to prevent multiple global instances.
+ * 
+ * @throws LogicException If the global instance is already initialized.
+ * @example
+ * ```php
+ * Sex::initGlobal();
+ * 
+ * Sex::put('user_id', 42);
+ * 
+ * $userId = Sex::get('user_id');
+ * ```
+ * 
+ * Otherwise you can instantiate your own Sex instance for a specific namespace:
+ * ```php
+ * $session = new Sex('myPrefix');
+ * $session->put('foo', 'bar');
+ * $value = $session->get('foo'); // 'bar'
+ * ```
+ */
+Sex::initGlobal();
+
+/**
  * Create the application router.
  * 
  * The App instance manages all API endpoints and coordinates request routing.
