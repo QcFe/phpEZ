@@ -20,7 +20,7 @@
  * @see DoNotSerialize
  * @see DoNotDeserialize
  */
-#[Attribute(Attribute::TARGET_PROPERTY)]
+// Children of this class need #[Attribute(Attribute::TARGET_PROPERTY)] annotation
 class ObjAttribute {
   /**
    * Extract an attribute instance from a reflected property.
@@ -32,10 +32,8 @@ class ObjAttribute {
    * @return static|false The attribute instance if found, false otherwise.
    */
   public static function of(ReflectionProperty $field): static|null {
-    foreach ($field->getAttributes() as $attr) {
-      if ($attr->getName() === static::class) {
-        return new static(...$attr->getArguments());
-      }
+    foreach ($field->getAttributes(static::class) as $attr) {
+      return $attr->newInstance();
     }
     return null;
   }
@@ -61,10 +59,8 @@ class ObjDef {
    */
   public static function of(string $class): static|null {
     $reflectionClass = new ReflectionClass($class);
-    foreach ($reflectionClass->getAttributes() as $attr) {
-      if ($attr->getName() === static::class) {
-        return new static(...$attr->getArguments());
-      }
+    foreach ($reflectionClass->getAttributes(static::class) as $attr) {
+      return $attr->newInstance();
     }
     return null;
   }
@@ -93,6 +89,7 @@ class ObjDef {
  * 
  * @subpackage iface
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class OmitEmpty extends ObjAttribute {
 }
 
@@ -114,6 +111,7 @@ class OmitEmpty extends ObjAttribute {
  * @see Obj::__unserialize()
  * @subpackage iface
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class ArrayOf extends ObjAttribute {
   /**
    * Initialize the array element type attribute.
@@ -141,6 +139,7 @@ class ArrayOf extends ObjAttribute {
  * ```
  * @subpackage iface
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class DoNotSerialize extends ObjAttribute {
 }
 
@@ -162,6 +161,7 @@ class DoNotSerialize extends ObjAttribute {
  * 
  * @subpackage iface
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class DoNotDeserialize extends ObjAttribute {
 }
 

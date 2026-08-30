@@ -12,6 +12,7 @@
  * @subpackage db
  * @see Model::ddl()
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class Unique extends ObjAttribute {
 }
 
@@ -32,6 +33,7 @@ class Unique extends ObjAttribute {
  * @subpackage db
  * @see Model::ddl()
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class UniqueMulti extends ObjAttribute {
   /**
    * Initialize the composite unique index attribute.
@@ -55,6 +57,7 @@ class UniqueMulti extends ObjAttribute {
  * @subpackage db
  * @see Model::ddl()
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class Index extends ObjAttribute {
   /**
    * Initialize the index attribute.
@@ -84,6 +87,7 @@ class Index extends ObjAttribute {
  * 
  * @subpackage sex
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class CustomType extends ObjAttribute {
   /**
    * Initialize the custom type attribute.
@@ -108,6 +112,7 @@ class CustomType extends ObjAttribute {
  * @see Model::ddl()
  * @subpackage db
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class OnUpdate extends ObjAttribute {
   /**
    * Initialize the ON UPDATE attribute.
@@ -136,6 +141,7 @@ class OnUpdate extends ObjAttribute {
  * @see Model::ddl()
  * @subpackage db
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class DbDefault extends ObjAttribute {
   /**
    * Initialize the default value attribute.
@@ -155,6 +161,7 @@ class DbDefault extends ObjAttribute {
  * @see Model::ddl()
  * @subpackage db
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class NotNull extends ObjAttribute {
 }
 
@@ -189,6 +196,7 @@ enum DbThen: string {
  * @see Model::ddlDeps()
  * @subpackage db
  */
+#[Attribute(Attribute::TARGET_PROPERTY)]
 class Foreign extends ObjAttribute {
   /**
    * Initialize the foreign key attribute.
